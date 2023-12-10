@@ -1,3 +1,4 @@
+---
 - name: Install kubectl, Minikube on a VM
   hosts: localhost
   user: ubuntu
@@ -19,8 +20,9 @@
         - software-properties-common
 
     - name: Install kubectl
-      shell:
-        cmd: sudo apt-get update && sudo apt-get install -y kubectl
+      apt:
+        name: kubectl
+        state: present
 
     - name: Install Minikube
       shell:
@@ -31,10 +33,14 @@
         cmd: minikube start --driver=docker
 
     - name: Deploy Docker image to Kubernetes
-      shell: kubectl create deployment myapp --image=plavelle7/cw2:1
+      shell:
+        cmd: kubectl create deployment myapp --image=plavelle7/cw2:1
 
     - name: Expose the deployment as a service
-      shell: kubectl expose deployment myapp --type=LoadBalancer --port=8080
+      shell:
+        cmd: kubectl expose deployment myapp --type=LoadBalancer --port=8080
 
     - name: Scale the deployment
-      shell: kubectl scale deployment myapp --replicas=3
+      shell:
+        cmd: kubectl scale deployment myapp --replicas=3
+

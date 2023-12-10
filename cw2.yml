@@ -1,0 +1,40 @@
+- name: Install kubectl, Minikube on a VM
+  hosts: localhost
+  user: ubuntu
+  become: yes
+
+  tasks:
+    - name: Update APT Package Manager
+      apt:
+        update_cache: yes
+
+    - name: Install dependency packages
+      apt:
+        name: "{{ item }}"
+      with_items:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gnupg-agent
+        - software-properties-common
+
+    - name: Install kubectl
+      shell:
+        cmd: sudo apt-get update && sudo apt-get install -y kubectl
+
+    - name: Install Minikube
+      shell:
+        cmd: curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb && sudo dpkg -i minikube_latest_amd64.deb
+
+    - name: Start Minikube
+      shell:
+        cmd: minikube start --driver=docker
+
+    - name: Deploy Docker image to Kubernetes
+      shell: kubectl create deployment myapp --image=plavelle7/cw2:1
+
+    - name: Expose the deployment as a service
+      shell: kubectl expose deployment myapp --type=LoadBalancer --port=8080
+
+    - name: Scale the deployment
+      shell: kubectl scale deployment myapp --replicas=3
